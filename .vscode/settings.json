@@ -1,0 +1,8 @@
+{
+  "javascript.preferences.quoteStyle": "single",
+  "typescript.preferences.quoteStyle": "single",
+  "editor.formatOnSave": true,
+  "prettier.singleQuote": true,
+  "typescript.format.semicolons": "insert",
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
