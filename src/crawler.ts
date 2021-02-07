@@ -2,7 +2,6 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import codes from './codes';
 import sgMail from '@sendgrid/mail';
-import dotenv from 'dotenv';
 
 interface Indicators {
   [indicator: string]: number;
@@ -114,8 +113,8 @@ class BarchartCrawler extends Crawler {
     if (process.env.SENDGRID_KEY) {
       sgMail.setApiKey(process.env.SENDGRID_KEY);
       const msg = {
-        to: 'loophone@gmail.com', // Change to your recipient
-        from: 'zzwtwz@gmail.com', // Change to your verified sender
+        to: process.env.TO_EMAIL || '', // Change to your recipient
+        from: process.env.FROM_EMAIL || '', // Change to your verified sender
         subject: 'Daily Stock Indicators Alerts',
         text: 'hi there',
         html: text,
@@ -132,8 +131,5 @@ class BarchartCrawler extends Crawler {
   }
 }
 
-if (process.env.NODE_ENV === 'dev') {
-  dotenv.config();
-}
 const crawler = new BarchartCrawler();
 crawler.start();
