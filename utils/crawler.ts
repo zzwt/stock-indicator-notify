@@ -1,7 +1,6 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 import codes from './codes';
-import sgMail from '@sendgrid/mail';
 
 interface Indicators {
   [indicator: string]: number;
@@ -9,6 +8,18 @@ interface Indicators {
 
 interface Alerts {
   [stock: string]: Indicators;
+}
+
+interface Query {
+  pageSize: number;
+  currentPage: number;
+  totalPages: number;
+  codes: string[];
+}
+
+export interface Result {
+  meta: Query;
+  result: Alerts;
 }
 
 abstract class Crawler {
@@ -22,7 +33,7 @@ abstract class Crawler {
   }
 
   protected composeAlerts(alerts: Alerts) {
-    let text = '';
+    let text = "Today's Alerts<br>";
 
     Object.keys(alerts).map((code) => {
       if (Object.keys(alerts[code]).length > 0) {
@@ -37,14 +48,28 @@ abstract class Crawler {
     return text;
   }
 
+  protected pagination(pageSize: number, currentPage: number): Query {
+    return {
+      pageSize: pageSize,
+      currentPage: currentPage,
+      totalPages: Math.ceil(this._codes.length / pageSize),
+      codes: this._codes.slice(
+        pageSize * (currentPage - 1),
+        pageSize * currentPage
+      ),
+    };
+  }
+
   abstract extractIndicators(rawHtml: string): Indicators;
-  abstract processIndicators(alerts: Alerts): void;
 }
 
 export class BarchartCrawler extends Crawler {
-  constructor() {
+  query: Query = { pageSize: 1, currentPage: 1, totalPages: 1, codes: [''] };
+
+  constructor(private _pageSize: number, private _currentPage: number) {
     super();
-    this._codes = this.codePreProcess(this._codes);
+    this.query = this.pagination(_pageSize, _currentPage);
+    this.query.codes = this.codePreProcess(this.query.codes);
   }
 
   private codePreProcess(codes: string[]) {
@@ -52,8 +77,8 @@ export class BarchartCrawler extends Crawler {
   }
 
   public async start() {
-    await Promise.all(
-      this._codes.map(async (code) => {
+    return await Promise.all(
+      this.query.codes.map(async (code) => {
         try {
           const rawHtml = await this.getRawHtml(code);
           const indicators = this.extractIndicators(rawHtml);
@@ -68,11 +93,16 @@ export class BarchartCrawler extends Crawler {
       let errorCount = 0;
       let alerts: Alerts = {};
       values.map((value: [string, Indicators] | undefined) => {
-        if (value) alerts[value[0]] = value[1];
-        else errorCount += 1;
+        if (value) {
+          if (Object.keys(value[1]).length > 0) alerts[value[0]] = value[1];
+        } else errorCount += 1;
       });
       console.log(`Error Code Count: ${errorCount}`);
-      this.processIndicators(alerts);
+      const val: Result = {
+        meta: this.query,
+        result: alerts,
+      };
+      return val;
     });
   }
 
@@ -102,31 +132,5 @@ export class BarchartCrawler extends Crawler {
     const rsi = this.filterRSI(this.parseRSI(rawHtml));
     if (rsi) results['rsi'] = rsi;
     return results;
-  }
-
-  processIndicators(alerts: Alerts) {
-    const text = this.composeAlerts(alerts);
-    this.sendEmail(text);
-  }
-
-  private sendEmail(text: string) {
-    if (process.env.SENDGRID_KEY) {
-      sgMail.setApiKey(process.env.SENDGRID_KEY);
-      const msg = {
-        to: process.env.TO_EMAIL || '', // Change to your recipient
-        from: process.env.FROM_EMAIL || '', // Change to your verified sender
-        subject: 'Daily Stock Indicators Alerts',
-        text: 'hi there',
-        html: text,
-      };
-      sgMail
-        .send(msg)
-        .then(() => {
-          console.log('Email sent');
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
   }
 }

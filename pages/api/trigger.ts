@@ -3,11 +3,11 @@ import { BarchartCrawler } from './../../utils/crawler';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    const { AppSecret } = req.body;
+    const { AppSecret, pageSize, currentPage } = req.body;
     if (AppSecret === process.env.APP_SECRET) {
-      const crawler = new BarchartCrawler();
-      await crawler.start();
-      return res.status(200).send({ msg: 'success' });
+      const crawler = new BarchartCrawler(pageSize, currentPage);
+      const result = await crawler.start();
+      return res.status(200).send(result);
     }
     return res.status(500).send({ msg: 'Secret is not corrent', error: true });
   } else {
