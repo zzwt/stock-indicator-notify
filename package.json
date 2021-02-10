@@ -8,7 +8,7 @@
     "dev:run": "nodemon -r dotenv/config ./build/server.js",
     "dev": "tsc && concurrently npm:dev:*",
     "build": "tsc",
-    "start": "npm run build && node ./build/server.js"
+    "start": "node ./build/server.js"
   },
   "author": "",
   "license": "ISC",
