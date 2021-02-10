@@ -44,7 +44,7 @@ var body_parser_1 = __importDefault(require("body-parser"));
 var crawler_1 = require("./crawler");
 var app = express_1.default();
 app.use(body_parser_1.default.urlencoded({ extended: false }));
-app.post('/', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.post('/trigger', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var AppSecret, crawler;
     return __generator(this, function (_a) {
         switch (_a.label) {

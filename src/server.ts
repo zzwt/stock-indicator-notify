@@ -6,7 +6,7 @@ const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.post('/', async (req: Request, res: Response) => {
+app.post('/trigger', async (req: Request, res: Response) => {
   const { AppSecret } = req.body;
   if (AppSecret === process.env.APP_SECRET) {
     const crawler = new BarchartCrawler();
