@@ -7,10 +7,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     if (AppSecret === process.env.APP_SECRET) {
       const crawler = new BarchartCrawler();
       await crawler.start();
-      return res.send({ msg: 'success' });
+      return res.status(200).send({ msg: 'success' });
     }
-    return res.send({ msg: 'Secret is not corrent', error: true });
+    return res.status(500).send({ msg: 'Secret is not corrent', error: true });
   } else {
-    return res.send({ msg: 'Method not supported', error: true });
+    return res.status(405).send({ msg: 'Method not supported', error: true });
   }
 };
