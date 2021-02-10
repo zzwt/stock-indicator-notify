@@ -41,7 +41,7 @@ abstract class Crawler {
   abstract processIndicators(alerts: Alerts): void;
 }
 
-class BarchartCrawler extends Crawler {
+export class BarchartCrawler extends Crawler {
   constructor() {
     super();
     this._codes = this.codePreProcess(this._codes);
@@ -52,7 +52,7 @@ class BarchartCrawler extends Crawler {
   }
 
   public async start() {
-    Promise.all(
+    await Promise.all(
       this._codes.map(async (code) => {
         try {
           const rawHtml = await this.getRawHtml(code);
@@ -130,6 +130,3 @@ class BarchartCrawler extends Crawler {
     }
   }
 }
-
-const crawler = new BarchartCrawler();
-crawler.start();
