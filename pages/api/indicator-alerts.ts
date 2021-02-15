@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { BarchartCrawler } from './../../utils/crawler';
+import BarchartCrawler from '../../utils/BarchartCrawler';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
