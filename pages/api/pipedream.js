@@ -1,6 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+// import type { NextApiRequest, NextApiResponse } from 'next';
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async (req, res) => {
   if (req.method === 'POST') {
     const { AppSecret } = req.body;
     if (AppSecret === process.env.APP_SECRET) {
