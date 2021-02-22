@@ -181,6 +181,7 @@ const codes: string[] = [
   'RKN',
   'RLG',
   'RMD',
+  'RNT',
   'RUL',
   'RVS',
   'RZI',
